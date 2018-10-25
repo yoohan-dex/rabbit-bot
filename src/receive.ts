@@ -35,11 +35,14 @@ export default (rabbit: Wechaty) => {
         const order = { ...parseCommon(msg.text()), imageId };
         log('order', order);
         try {
-          await commitOrder(order);
+          const orderFromServer = await commitOrder(order);
+          console.log('orderFromServer', orderFromServer);
           await msg.say('[system]好哒，下单成功了');
           await qrcode.toFile(
             path.resolve(__dirname, '../tmp/qrcode.png'),
-            'sss'
+            `https://www.hotbody.wang/mp?id=${
+              orderFromServer.data.id
+            }&role=operator`
           );
           const userIdx = state.sendingOrderUser.indexOf(user.id);
           state.sendingOrderUser.splice(userIdx, 1);
