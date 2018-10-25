@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "es2017",
+    "target": "es2015",
     "outDir": "build/main",
     "rootDir": "src",
     "moduleResolution": "node",
@@ -12,7 +12,7 @@
     "strict": true /* Enable all strict type-checking options. */,
 
     /* Strict Type-Checking Options */
-    // "noImplicitAny": true /* Raise error on expressions and declarations with an implied 'any' type. */,
+    "noImplicitAny": false /* Raise error on expressions and declarations with an implied 'any' type. */,
     // "strictNullChecks": true /* Enable strict null checks. */,
     // "strictFunctionTypes": true /* Enable strict checking of function types. */,
     // "strictPropertyInitialization": true /* Enable strict checking of property initialization in classes. */,

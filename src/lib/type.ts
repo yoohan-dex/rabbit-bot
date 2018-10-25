@@ -1,0 +1,32 @@
+export const type: ReadonlyArray<any> = [
+  'material',
+  'pattern',
+  'printing',
+  'detail',
+  'sizeAndNum',
+  'totalNum',
+  'price',
+  'total',
+  'address',
+  'seller',
+  'express',
+  'remark',
+  'sendTime',
+  'company'
+];
+export const chineseType: ReadonlyArray<any> = [
+  '面料',
+  '纸样',
+  '印花',
+  '车衣',
+  '尺码',
+  '数量',
+  '单价',
+  '总价',
+  '地址',
+  '客户来源',
+  '快递',
+  '特别备注',
+  '发货日期',
+  '机构'
+];

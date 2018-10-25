@@ -3,9 +3,12 @@ build
 test
 src/**.js
 .idea/*
-
+.config/*
 coverage
 .nyc_output
 *.log
-
+rabbit.memory-card.json
 package-lock.json
+tmp
+.pki
+.nyc_output
