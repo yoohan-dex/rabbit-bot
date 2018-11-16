@@ -29,22 +29,34 @@ const say = (msg: Message) => async (str: string) => {
 
 export default (rabbit: Wechaty) => {
   rabbit.on('message', async msg => {
-    log(msg.text());
-    switch (msg.text()) {
-      case FORMAT_REQUEST:
-        await say(msg)(FORMAT_TYPE_ASK);
-        break;
-      case REQUEST_SEND_ORDER:
+    const msgText = msg.text();
+    if (msgText.includes(REQUEST_SEND_ORDER)) {
+      if (msgText.includes(' ')) {
+        const [, orderNum] = msgText.split(' ');
         await say(msg)(SENDING_IMAGE);
         const user = msg.from();
         if (user) {
-          state.sendingOrderUser.push(user.id);
+          state.sendingOrderUser.push({
+            orderNum,
+            userId: user.id
+          });
         }
+      }
+    }
+    log(msgText);
+    switch (msgText) {
+      case FORMAT_REQUEST:
+        await say(msg)(FORMAT_TYPE_ASK);
         break;
       case CANCEL_SEND_ORDER:
         const cancelUser = msg.from();
-        if (cancelUser && state.sendingOrderUser.includes(cancelUser.id)) {
-          const idx = state.sendingOrderUser.indexOf(cancelUser.id);
+        if (
+          cancelUser &&
+          state.sendingOrderUser.some(u => u.userId === cancelUser.id)
+        ) {
+          const idx = state.sendingOrderUser.findIndex(
+            u => u.userId === cancelUser.id
+          );
           state.sendingOrderUser.splice(idx, 1);
           // tslint:disable-next-line:no-object-mutation
           delete state[cancelUser.id]; // tslint:disable-line:no-delete

@@ -20,7 +20,7 @@ export default (rabbit: Wechaty) => {
       return;
     }
     const user = msg.from();
-    if (!user || !state.sendingOrderUser.includes(user.id)) {
+    if (!user || !state.sendingOrderUser.some(u => u.userId === user.id)) {
       return;
     }
     if (
@@ -29,14 +29,24 @@ export default (rabbit: Wechaty) => {
       msg.text().indexOf('[system]') === -1
     ) {
       try {
-        const imageId = state[user.id] as number;
-        log('imageId', imageId);
-        msg.say(`[system]imageId: $${imageId}`);
-        const order = { ...parseCommon(msg.text()), imageId };
+        const imageIds = state[user.id] as ReadonlyArray<number>;
+        const stateUser = state.sendingOrderUser.find(
+          u => u.userId === user.id
+        );
+        if (!stateUser) {
+          await msg.say('[system] 有问题');
+          throw new Error('有问题咯');
+        }
+        msg.say(`[system]imageId: $${imageIds}`);
+        const order = {
+          ...parseCommon(msg.text()),
+          imageIds,
+          orderNum: stateUser.orderNum,
+          orderNumYear: state.orderNumYear
+        };
         log('order', order);
         try {
           const orderFromServer = await commitOrder(order);
-          console.log('orderFromServer', orderFromServer);
           await msg.say('[system]好哒，下单成功了');
           await qrcode.toFile(
             path.resolve(__dirname, '../tmp/qrcode.png'),
@@ -44,7 +54,9 @@ export default (rabbit: Wechaty) => {
               orderFromServer.data.id
             }&role=operator`
           );
-          const userIdx = state.sendingOrderUser.indexOf(user.id);
+          const userIdx = state.sendingOrderUser.findIndex(
+            u => u.userId === user.id
+          );
           state.sendingOrderUser.splice(userIdx, 1);
           const fileBox = FileBox.fromFile(
             path.resolve(__dirname, '../tmp/qrcode.png')
@@ -68,25 +80,6 @@ export default (rabbit: Wechaty) => {
       const formdata = new FormData();
 
       formdata.append('file', stream);
-      // try {
-      //   const res = await axios.post(
-      //     'http://192.168.0.133:3000/common/upload',
-      //     {
-      //       file: stream
-      //     },
-      //     {
-      //       headers: {
-      //         Accept: 'application/json',
-      //         'Content-Type': 'multipart/form-data'
-      //       }
-      //     }
-      //   );
-
-      //   log('status', res.status);
-      //   log('data', res.data);
-      // } catch (e) {
-      //   log('e', e);
-      // }
       try {
         const { data } = await axios.post(
           `${config.server}/common/upload`,
@@ -97,8 +90,10 @@ export default (rabbit: Wechaty) => {
         );
         log('id', data.id);
         // tslint:disable-next-line:no-object-mutation
-        state[user.id] = data.id;
-        await msg.say('[system]好哒，接下来请发送订单给我');
+        state[user.id] = state[user.id]
+          ? [...state[user.id], data.id]
+          : [data.id];
+        await msg.say('[system]好的，你可以继续发送效果图，或者订单信息');
       } catch (e) {
         log(e);
       }
