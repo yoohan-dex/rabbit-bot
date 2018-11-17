@@ -1,5 +1,5 @@
 export const state: {
-  readonly orderNumYear: number;
+  readonly orderNumYear: string;
   // tslint:disable-next-line:readonly-array
   readonly sendingOrderUser: Array<{
     readonly userId: string;
@@ -8,6 +8,6 @@ export const state: {
   // tslint:disable-next-line:readonly-keyword
   [key: string]: any;
 } = {
-  orderNumYear: 2018,
+  orderNumYear: '2018',
   sendingOrderUser: []
 };
